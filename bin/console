@@ -1,0 +1,85 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use App\Repository\JsonCourseRepository;
+use App\Service\CourseService;
+
+$argv0 = $argv[0] ?? 'console';
+$repoFile = __DIR__ . '/../data/courses.json';
+$repo = new JsonCourseRepository($repoFile);
+$service = new CourseService($repo);
+
+$cmd = $argv[1] ?? 'help';
+
+function usage(): void {
+    echo "Course Manager CLI\n";
+    echo "Usage:\n";
+    echo "  console list\n";
+    echo "  console create \"Course Name\" \"Optional description\"\n";
+    echo "  console get <id>\n";
+    echo "  console delete <id>\n";
+    echo "  console help\n";
+}
+
+switch ($cmd) {
+    case 'help':
+        usage();
+        exit(0);
+
+    case 'list':
+        $courses = $service->listCourses();
+        foreach ($courses as $c) {
+            echo sprintf("%s | %s\n", $c->getId(), $c->getName());
+        }
+        exit(0);
+
+    case 'create':
+        $name = $argv[2] ?? '';
+        $desc = $argv[3] ?? null;
+        if ($name === '') {
+            echo "Error: name required\n";
+            exit(1);
+        }
+        try {
+            $course = $service->createCourse($name, $desc);
+            echo "Created: " . $course->getId() . " | " . $course->getName() . PHP_EOL;
+            exit(0);
+        } catch (Exception $e) {
+            echo "Error: " . $e->getMessage() . PHP_EOL;
+            exit(1);
+        }
+
+    case 'get':
+        $id = $argv[2] ?? '';
+        if ($id === '') {
+            echo "Error: id required\n";
+            exit(1);
+        }
+        $c = $service->getCourse($id);
+        if ($c === null) {
+            echo "Not found\n";
+            exit(1);
+        }
+        echo json_encode($c->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL;
+        exit(0);
+
+    case 'delete':
+        $id = $argv[2] ?? '';
+        if ($id === '') {
+            echo "Error: id required\n";
+            exit(1);
+        }
+        if ($service->deleteCourse($id)) {
+            echo "Deleted\n";
+            exit(0);
+        }
+        echo "Not found\n";
+        exit(1);
+
+    default:
+        usage();
+        exit(0);
+}
