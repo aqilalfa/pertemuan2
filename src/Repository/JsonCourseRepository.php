@@ -56,6 +56,17 @@ class JsonCourseRepository implements CourseRepositoryInterface
         return $result;
     }
 
+    public function update(Course $course): bool
+    {
+        $data = $this->readData();
+        if (!isset($data[$course->getId()])) {
+            return false;
+        }
+        $data[$course->getId()] = $course->toArray();
+        $this->writeData($data);
+        return true;
+    }
+
     public function delete(string $id): bool
     {
         $data = $this->readData();

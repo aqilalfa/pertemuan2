@@ -29,6 +29,15 @@ class InMemoryCourseRepository implements CourseRepositoryInterface
         return $result;
     }
 
+    public function update(Course $course): bool
+    {
+        if (!isset($this->store[$course->getId()])) {
+            return false;
+        }
+        $this->store[$course->getId()] = $course->toArray();
+        return true;
+    }
+
     public function delete(string $id): bool
     {
         if (!isset($this->store[$id])) {

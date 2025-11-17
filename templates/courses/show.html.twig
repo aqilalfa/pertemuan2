@@ -1,0 +1,75 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/courses">Courses</a></li>
+                <li class="breadcrumb-item active">{{ course.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h1 class="h3 mb-0"><i class="bi bi-book"></i> {{ course.name }}</h1>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3"><i class="bi bi-tag"></i> Course ID:</dt>
+                    <dd class="col-sm-9">
+                        <code>{{ course.id }}</code>
+                    </dd>
+
+                    <dt class="col-sm-3"><i class="bi bi-bookmark"></i> Name:</dt>
+                    <dd class="col-sm-9">{{ course.name }}</dd>
+
+                    <dt class="col-sm-3"><i class="bi bi-file-text"></i> Description:</dt>
+                    <dd class="col-sm-9">
+                        {% if course.description %}
+                            {{ course.description }}
+                        {% else %}
+                            <span class="text-muted fst-italic">No description provided</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+
+                <hr>
+
+                <div class="d-flex gap-2">
+                    <a href="/courses/{{ course.id }}/edit" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Edit Course
+                    </a>
+                    <button type="button" class="btn btn-danger delete-btn" data-course-id="{{ course.id }}" data-course-name="{{ course.name }}">
+                        <i class="bi bi-trash"></i> Delete Course
+                    </button>
+                    <a href="/courses" class="btn btn-secondary ms-auto">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete course <strong id="deleteCourseNameText"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

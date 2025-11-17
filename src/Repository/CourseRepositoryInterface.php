@@ -11,6 +11,7 @@ interface CourseRepositoryInterface
     public function find(string $id): ?Course;
     /** @return Course[] */
     public function all(): array;
+    public function update(Course $course): bool;
     public function delete(string $id): bool;
     public function clear(): void;
 }

@@ -40,6 +40,22 @@ class CourseService
         return $this->repo->all();
     }
 
+    public function updateCourse(string $id, string $name, ?string $description = null): bool
+    {
+        $name = trim($name);
+        if ($name === '') {
+            throw new InvalidArgumentException('Course name cannot be empty');
+        }
+
+        $existing = $this->repo->find($id);
+        if ($existing === null) {
+            return false;
+        }
+
+        $updatedCourse = new Course($id, $name, $description);
+        return $this->repo->update($updatedCourse);
+    }
+
     public function deleteCourse(string $id): bool
     {
         return $this->repo->delete($id);

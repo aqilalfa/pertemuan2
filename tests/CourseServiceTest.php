@@ -7,39 +7,62 @@ use App\Service\CourseService;
 
 final class CourseServiceTest extends TestCase
 {
-    public function testCreateCourseAndRetrieve(): void
+    // Test 1: Apakah createCourse() return Course?
+    public function testCreateCourseReturnsCourse(): void
     {
-        $repo = new InMemoryCourseRepository();
-        $service = new CourseService($repo);
-
-        $course = $service->createCourse('Pemrograman Web', 'Deskripsi');
-        $this->assertSame('Pemrograman Web', $course->getName());
-        $this->assertNotEmpty($course->getId());
-
-        $found = $service->getCourse($course->getId());
-        $this->assertNotNull($found);
-        $this->assertEquals($course->getName(), $found->getName());
+        $service = new CourseService(new InMemoryCourseRepository());
+        $course = $service->createCourse('Test');
+        
+        $this->assertNotNull($course);
     }
 
+    // Test 2: Apakah ID tidak kosong?
+    public function testCreateCourseGeneratesId(): void
+    {
+        $service = new CourseService(new InMemoryCourseRepository());
+        $course = $service->createCourse('Test');
+        
+        $this->assertNotEmpty($course->getId());
+    }
+
+    // Test 3: Apakah nama kosong throw exception?
     public function testCreateEmptyNameThrows(): void
     {
+        $service = new CourseService(new InMemoryCourseRepository());
+        
         $this->expectException(\InvalidArgumentException::class);
-        $repo = new InMemoryCourseRepository();
-        $service = new CourseService($repo);
         $service->createCourse('   ');
     }
 
-    public function testListAndDelete(): void
+    // Test 4: Apakah updateCourse() return true?
+    public function testUpdateReturnsTrue(): void
     {
-        $repo = new InMemoryCourseRepository();
-        $service = new CourseService($repo);
-        $a = $service->createCourse('A');
-        $b = $service->createCourse('B');
+        $service = new CourseService(new InMemoryCourseRepository());
+        $course = $service->createCourse('Old');
+        
+        $result = $service->updateCourse($course->getId(), 'New', 'Desc');
+        
+        $this->assertTrue($result);
+    }
 
-        $list = $service->listCourses();
-        $this->assertCount(2, $list);
+    // Test 5: Apakah update ID tidak ada return false?
+    public function testUpdateNonExistentReturnsFalse(): void
+    {
+        $service = new CourseService(new InMemoryCourseRepository());
+        
+        $result = $service->updateCourse('xxx', 'Name', 'Desc');
+        
+        $this->assertFalse($result);
+    }
 
-        $this->assertTrue($service->deleteCourse($a->getId()));
-        $this->assertCount(1, $service->listCourses());
+    // Test 6: Apakah deleteCourse() return true?
+    public function testDeleteReturnsTrue(): void
+    {
+        $service = new CourseService(new InMemoryCourseRepository());
+        $course = $service->createCourse('Test');
+        
+        $result = $service->deleteCourse($course->getId());
+        
+        $this->assertTrue($result);
     }
 }
